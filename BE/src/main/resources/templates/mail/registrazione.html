@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="it">
+<body>
+
+<!-- th:fragment definisce il blocco che il layout andrà a inserire -->
+<th:block th:fragment="contenuto">
+
+  <h1 style="margin:0 0 12px 0; font-family:Arial,sans-serif; font-size:22px;
+             font-weight:bold; color:#16171c;">
+    Ciao <span th:text="${nome}">Mario</span>, benvenuto su Sinapsi
+  </h1>
+
+  <p style="margin:0 0 24px 0;">
+    Manca solo un passaggio: conferma il tuo indirizzo email per attivare l'account
+    e comparire nella rubrica degli altri utenti.
+  </p>
+
+  <!-- Il pulsante e' una tabella: <a> con padding non e' affidabile su Outlook -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+         style="margin:0 0 24px 0;">
+    <tr>
+      <td style="background-color:#1f6b52; border-radius:8px;">
+        <a th:href="${link}" href="#"
+           style="display:inline-block; padding:13px 26px;
+                  font-family:Arial,sans-serif; font-size:15px; font-weight:bold;
+                  color:#ffffff; text-decoration:none;">
+          Attiva l'account
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 8px 0; font-size:14px;">
+    Se il pulsante non funziona, inserisci questo codice nella pagina di verifica:
+  </p>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="margin:0 0 24px 0;">
+    <tr>
+      <td style="background-color:#f2f4f6; border:1px solid #dfe3e8; border-radius:8px;
+                 padding:14px 16px; font-family:'Courier New',monospace; font-size:15px;
+                 color:#16171c; word-break:break-all;"
+          th:text="${codice}">CODICE</td>
+    </tr>
+  </table>
+
+  <p style="margin:0; font-size:13px; color:#8a94a2;">
+    Il link e il codice scadono tra 24 ore. Se non hai richiesto tu la registrazione,
+    ignora questo messaggio: senza conferma l'account resta inattivo.
+  </p>
+
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+# === IDE ===
+# Configurazione locale di IntelliJ IDEA: contiene percorsi e versioni JDK
+# specifici della macchina, va rigenerata dall'IDE a partire dal pom.xml
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# === macOS ===
+.DS_Store
+
+# === Build (rete di sicurezza: i sottoprogetti hanno già i propri .gitignore) ===
+target/
+node_modules/
+dist/
+
+# === Segreti ===
+.env
+!.env.example
+
+# === Log ===
+*.log
