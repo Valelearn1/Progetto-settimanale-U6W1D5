@@ -1,111 +1,216 @@
+/*
+  Palette Filo Rosso.
+
+  Il rosso appartiene al FILO: marchio, bolle inviate, accenti. Non agli errori.
+  In una chat il rosso ha gia' due significati fortissimi (errore, non
+  disturbare), quindi i ruoli funzionali sono ridistribuiti:
+    - ambra  -> errori e avvisi
+    - verde  -> solo presenza online (verde=online e' una convenzione troppo
+                forte per combatterla)
+
+  DUE TEMI, TRE STATI.
+  L'utente puo' scegliere chiaro o scuro, oppure lasciare decidere al sistema:
+    :root                         -> tema scuro, il default del progetto
+    @media (prefers-color-scheme: light) + :not([data-theme="dark"])
+                                  -> chiaro se lo chiede il sistema e l'utente
+                                     non ha scelto esplicitamente il contrario
+    :root[data-theme="light"]     -> scelta esplicita dell'utente, vince su tutto
+
+  Regola d'oro: i componenti usano SOLO i token. Un colore scritto direttamente
+  dentro un blocco di tema non varrebbe negli altri stati, ed e' il bug classico
+  del testo di un tema sul fondo dell'altro.
+*/
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* --- tema scuro (default) --- */
+  --sfondo: url('/sfondo-scuro.jpg');
+  --bg-deep: #16141a;
+  /* I pannelli sono traslucidi: lo sfondo deve trasparire, ma il testo che ci
+     sta sopra deve restare leggibile. L'alpha è il compromesso fra le due
+     cose, ed è più alta dove il testo è più fitto (sidebar, bolle). */
+  --bg-sidebar: rgba(30, 26, 31, 0.86);
+  --bg-chat: rgba(37, 32, 39, 0.74);
+  /* Velo dell'area conversazione: molto piu' leggero, perche' qui
+     l'immagine deve VEDERSI. La leggibilita' la garantiscono le bolle,
+     che sono opache, non il pannello. */
+  --velo-chat: rgba(22, 20, 26, 0.52);
+  --bg-raised: rgba(47, 40, 48, 0.92);
+  --bg-hover: rgba(55, 46, 56, 0.95);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --filo: #e0485b;
+  --filo-deep: #8c2233;
+  --filo-tenue: rgba(224, 72, 91, 0.14);
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --warn: #f0a62b;
+  --su-warn: #2a1c02;
+  --avviso-fondo: rgba(240, 166, 43, 0.12);
+  --avviso-testo: #f3cf92;
+  --ok-fondo: rgba(78, 201, 160, 0.12);
+  --ok-testo: #a6e6ce;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --online: #4ec9a0;
+
+  --text: #efe8ea;
+  --text-muted: #a99ba0;
+  --su-filo: #ffffff;
+  --bordo: #382f39;
+
+  --ombra: none;
+
+  --raggio: 10px;
+  --spazio: 16px;
+
+  font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  color-scheme: dark;
+}
+
+/* Il chiaro non è il buio invertito: i rossi si scuriscono per restare
+   leggibili sul bianco, e i neutri restano caldi invece di virare al grigio. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --sfondo: url('/sfondo-chiaro.jpg');
+    --bg-deep: #efe9eb;
+    --bg-sidebar: rgba(255, 255, 255, 0.88);
+    --bg-chat: rgba(250, 248, 249, 0.76);
+    --velo-chat: rgba(252, 250, 251, 0.58);
+    --bg-raised: rgba(240, 234, 236, 0.94);
+    --bg-hover: rgba(230, 221, 224, 0.96);
+
+    --filo: #c0334a;
+    --filo-deep: #9c2438;
+    --filo-tenue: rgba(192, 51, 74, 0.10);
+
+    --warn: #b87407;
+    --su-warn: #ffffff;
+    --avviso-fondo: rgba(184, 116, 7, 0.10);
+    --avviso-testo: #8a5605;
+    --ok-fondo: rgba(31, 138, 104, 0.10);
+    --ok-testo: #176b50;
+
+    --online: #1f8a68;
+
+    --text: #1d181b;
+    --text-muted: #6b5f64;
+    --su-filo: #ffffff;
+    --bordo: #ded3d7;
+
+    --ombra: 0 1px 2px rgba(29, 24, 27, 0.06);
+
+    color-scheme: light;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Scelta esplicita dell'utente: deve vincere in entrambe le direzioni. */
+:root[data-theme='light'] {
+  --sfondo: url('/sfondo-chiaro.jpg');
+  --bg-deep: #efe9eb;
+  --bg-sidebar: rgba(255, 255, 255, 0.88);
+  --bg-chat: rgba(250, 248, 249, 0.76);
+  --velo-chat: rgba(252, 250, 251, 0.58);
+  --bg-raised: rgba(240, 234, 236, 0.94);
+  --bg-hover: rgba(230, 221, 224, 0.96);
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+  --filo: #c0334a;
+  --filo-deep: #9c2438;
+  --filo-tenue: rgba(192, 51, 74, 0.10);
+
+  --warn: #b87407;
+  --su-warn: #ffffff;
+  --avviso-fondo: rgba(184, 116, 7, 0.10);
+  --avviso-testo: #8a5605;
+  --ok-fondo: rgba(31, 138, 104, 0.10);
+  --ok-testo: #176b50;
+
+  --online: #1f8a68;
+
+  --text: #1d181b;
+  --text-muted: #6b5f64;
+  --su-filo: #ffffff;
+  --bordo: #ded3d7;
+
+  --ombra: 0 1px 2px rgba(29, 24, 27, 0.06);
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
   margin: 0;
+  /* Colore pieno sotto l'immagine: è ciò che si vede mentre il JPEG carica,
+     e se l'immagine non arrivasse la pagina resterebbe comunque leggibile. */
+  background-color: var(--bg-deep);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/*
+  Lo sfondo è uno pseudo-elemento fisso e non `background-attachment: fixed`
+  sul body: quest'ultimo costringe il browser a ridisegnare l'immagine a ogni
+  scroll, ed è una delle cause più comuni di scroll a scatti.
+  Qui l'immagine sta in un livello suo, dietro tutto, e non si muove mai.
+*/
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--sfondo);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/*
+  Nelle pagine con la sidebar lo sfondo comincia DOPO di essa.
+  La figura di sinistra dell'immagine cade proprio sotto i 300px della colonna:
+  lasciandola sotto, meta' della composizione sparirebbe. Ricentrando il
+  riquadro sull'area libera, il filo si vede per intero.
+*/
+body:has(.sidebar)::before {
+  left: 300px;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@media (max-width: 720px) {
+  body:has(.sidebar)::before {
+    left: 0;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--raggio);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Lo stato di focus deve restare visibile: si naviga anche da tastiera. */
+:focus-visible {
+  outline: 2px solid var(--filo);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }

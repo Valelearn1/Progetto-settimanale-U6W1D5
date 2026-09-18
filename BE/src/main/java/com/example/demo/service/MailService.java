@@ -40,12 +40,12 @@ public class MailService {
                 URLEncoder.encode(codice, StandardCharsets.UTF_8));
 
         invia(destinatario,
-                "Conferma la tua registrazione a Sinapsi",
+                "Conferma la tua registrazione a Filo Rosso",
                 "mail/registrazione",
                 Map.of("nome", displayName, "codice", codice, "link", link),
-                "Attiva il tuo account Sinapsi",
+                "Attiva il tuo account Filo Rosso",
                 """
-                Ciao %s, benvenuto su Sinapsi.
+                Ciao %s, benvenuto su Filo Rosso.
 
                 Per attivare l'account apri questo link (valido 24 ore):
                 %s
@@ -62,7 +62,7 @@ public class MailService {
         long totale = dati.inviati() + dati.ricevuti();
 
         invia(dati.email(),
-                "Le tue statistiche su Sinapsi",
+                "Le tue statistiche su Filo Rosso",
                 "mail/statistiche",
                 Map.of(
                         "nome", dati.displayName(),
@@ -74,7 +74,7 @@ public class MailService {
                 "%d messaggi inviati, %d ricevuti, %d conversazioni"
                         .formatted(dati.inviati(), dati.ricevuti(), dati.chatAperte()),
                 """
-                Ciao %s, ecco il riepilogo della tua attività su Sinapsi dal %s.
+                Ciao %s, ecco il riepilogo della tua attività su Filo Rosso dal %s.
 
                 Messaggi inviati:   %d
                 Messaggi ricevuti:  %d

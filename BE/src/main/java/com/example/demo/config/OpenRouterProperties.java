@@ -40,7 +40,7 @@ public class OpenRouterProperties {
     private int maxTokens = 300;
 
     /** Titolo mostrato nella dashboard di OpenRouter. */
-    private String appTitle = "Sinapsi";
+    private String appTitle = "Filo Rosso";
 
     /** Origine dichiarata a OpenRouter (header HTTP-Referer). */
     private String referer = "http://localhost:5173";

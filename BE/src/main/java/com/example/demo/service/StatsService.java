@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.response.PeerStatsDTO;
 import com.example.demo.dto.response.StatsResponseDTO;
 import com.example.demo.entity.User;
 import com.example.demo.event.MailEvents;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,12 @@ public class StatsService {
                 messageRepository.countRicevuti(io.getId()),
                 chatRepository.countChatAperte(io.getId()),
                 io.getCreatedAt());
+    }
+
+    /** I nodi del grafo: i contatti con cui hai un filo, il piu' fitto per primo. */
+    @Transactional(readOnly = true)
+    public List<PeerStatsDTO> rete(User io) {
+        return chatRepository.reteDiContatti(io.getId());
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.response.PeerStatsDTO;
 import com.example.demo.dto.response.StatsResponseDTO;
 import com.example.demo.entity.User;
 import com.example.demo.service.StatsService;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,6 +26,12 @@ public class StatsController {
     @GetMapping
     public StatsResponseDTO mie(@AuthenticationPrincipal User io) {
         return statsService.calcola(io);
+    }
+
+    /** I nodi del grafo dei contatti (§9.2 della progettazione). */
+    @GetMapping("/network")
+    public List<PeerStatsDTO> rete(@AuthenticationPrincipal User io) {
+        return statsService.rete(io);
     }
 
     /**

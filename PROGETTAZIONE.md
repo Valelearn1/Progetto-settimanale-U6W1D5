@@ -1,10 +1,13 @@
-# Progettazione — Sinapsi
+# Progettazione — Filo Rosso
 
 Webapp di messaggistica fra utenti registrati, con suggerimenti di risposta generati
 dall'AI, statistiche personali e recapito delle statistiche via email.
 
-> **Nome di lavoro:** *Sinapsi*. Compare in `spring.application.name`, nel titolo delle
-> email e nell'header `X-Title` verso OpenRouter. Se lo cambi, sono quei tre punti.
+> **Il nome.** *Filo Rosso*, dal filo rosso che lega due persone — e dal *filo rosso
+> del discorso*, quello che attraversa una conversazione e la tiene insieme. Entrambe
+> le letture descrivono una chat a due.
+> Forma tecnica `filorosso` (`spring.application.name`), forma in prosa **Filo Rosso**
+> (email, titoli, interfaccia), marchio **F** nel quadrato dell'header email.
 
 ---
 
@@ -784,7 +787,7 @@ Progetto-settimanale-U6W1D5/
 ### `application.properties`
 
 ```properties
-spring.application.name=sinapsi
+spring.application.name=filorosso
 
 # === Caricamento di .env ===
 # Spring Boot non legge i file .env di suo, e nessuna libreria esterna serve:
@@ -831,7 +834,7 @@ openrouter.base-url=https://openrouter.ai/api/v1
 openrouter.default-model=nex-agi/nex-n2.5-mini:free
 openrouter.model-label=Nex AGI: Nex-N2.5-Mini (free)
 openrouter.reasoning-enabled=false
-openrouter.app-title=Sinapsi
+openrouter.app-title=Filo Rosso
 openrouter.referer=http://localhost:5173
 openrouter.max-history-messages=12
 ```
@@ -865,19 +868,33 @@ OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 Ispirato a Discord nella struttura (colonna contatti a sinistra, conversazione a destra,
 composer in basso), con palette diversa: Discord è *blurple* su grigio freddo, qui si va
-su un **antracite caldo con accento verde menta**.
+su un **antracite caldo con il filo rosso** che dà il nome all'applicazione.
 
 | Ruolo | Hex | Uso |
 |---|---|---|
-| `--bg-deep` | `#16171c` | sfondo della colonna più esterna |
-| `--bg-sidebar` | `#1d1f26` | lista contatti |
-| `--bg-chat` | `#23262f` | area conversazione |
-| `--bg-raised` | `#2b2f3a` | bolla ricevuta, input |
-| `--accent` | `#3ecf8e` | bolla inviata, pulsanti, link |
-| `--accent-soft` | `#1f6b52` | hover, bordi attivi |
-| `--warn` | `#f0b429` | badge non letti |
-| `--text` | `#e7e9ee` | testo principale |
-| `--text-muted` | `#98a0b0` | orari, stati, segnaposto |
+| `--bg-deep` | `#16141a` | sfondo della colonna più esterna |
+| `--bg-sidebar` | `#1e1a1f` | lista contatti |
+| `--bg-chat` | `#252027` | area conversazione |
+| `--bg-raised` | `#2f2830` | bolla ricevuta, input |
+| `--filo` | `#e0485b` | **il filo**: bolle inviate, link, accenti |
+| `--filo-deep` | `#8c2233` | hover, bordi attivi, riempimenti estesi |
+| `--warn` | `#f0a62b` | **errori e avvisi** |
+| `--online` | `#4ec9a0` | pallino di presenza |
+| `--text` | `#efe8ea` | testo principale |
+| `--text-muted` | `#a99ba0` | orari, stati, segnaposto |
+
+**I neutri sono spostati verso il rosso, non verso il blu.** Accanto al carminio danno un
+effetto lacca; un grigio freddo lo farebbe sembrare un accento appiccicato su un tema
+scuro qualunque.
+
+> **Il rosso appartiene al filo, non agli errori.**
+> In un'interfaccia di chat il rosso ha già due significati fortissimi — *errore* e
+> *non disturbare* — e con bolle inviate rosse ogni cosa che scrivi sembrerebbe un avviso.
+> Qui il rosso è il marchio, quindi i ruoli funzionali vengono ridistribuiti:
+> l'**ambra** prende errori e avvisi, il **verde acqua** resta alla sola presenza online
+> (verde=online è una convenzione troppo forte per combatterla).
+> È una deviazione dalla convenzione, e va fatta consapevolmente e fino in fondo: un
+> rosso a metà fra marchio e allarme sarebbe peggio di entrambe le scelte.
 
 ### 9.1 Struttura
 
@@ -929,12 +946,17 @@ contatti, costruito con [three.js](https://threejs.org/).
 | Nodo centrale | l'utente collegato |
 | Nodi satellite | i contatti, colorati con il loro `avatarColor` |
 | Raggio del nodo | messaggi scambiati con quel contatto |
-| Opacità dell'arco | intensità della conversazione |
+| **Archi rossi** | **i fili** che ti legano a ciascuno; opacità = intensità della conversazione |
 | **Numero di nodi** | **la statistica "chat aperte", resa visibile invece che letta** |
 
 La rotazione fa un lavoro preciso: districa gli archi che in due dimensioni si
 sovrapporrebbero. Se il grafo fosse leggibile identico da fermo e piatto, il 3D sarebbe
 decorazione e andrebbe tolto.
+
+**Qui il grafo chiude il cerchio del nome.** Gli archi non sono "linee di collegamento":
+sono i fili rossi che legano l'utente a ciascuna persona con cui ha parlato, e più la
+conversazione è fitta più il filo è acceso. La pagina statistiche smette di essere un
+tabellone di numeri e diventa l'illustrazione letterale di *Filo Rosso*.
 
 I dati arrivano da `GET /api/stats/network` (§6), che restituisce un `PeerStatsDTO` per
 contatto: la query è in §4.6.

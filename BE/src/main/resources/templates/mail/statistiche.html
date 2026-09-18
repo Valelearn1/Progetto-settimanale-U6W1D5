@@ -5,13 +5,13 @@
 <th:block th:fragment="contenuto">
 
   <h1 style="margin:0 0 12px 0; font-family:Arial,sans-serif; font-size:22px;
-             font-weight:bold; color:#16171c;">
+             font-weight:bold; color:#16141a;">
     Ciao <span th:text="${nome}">Mario</span>, ecco la tua attività
   </h1>
 
   <p style="margin:0 0 24px 0;">
-    Un riepilogo di com'è andata su Sinapsi da quando ti sei iscritto,
-    il <span style="color:#16171c; font-weight:bold;" th:text="${dal}">1 gennaio 2026</span>.
+    Un riepilogo di com'è andata su Filo Rosso da quando ti sei iscritto,
+    il <span style="color:#16141a; font-weight:bold;" th:text="${dal}">1 gennaio 2026</span>.
   </p>
 
   <!--
@@ -23,36 +23,36 @@
          style="margin:0 0 24px 0;">
     <tr>
       <td width="33%" align="center"
-          style="background-color:#f2f4f6; border:1px solid #dfe3e8; border-radius:12px;
+          style="background-color:#f5f2f3; border:1px solid #e6dfe1; border-radius:12px;
                  padding:20px 8px;">
         <div style="font-family:Arial,sans-serif; font-size:30px; font-weight:bold;
-                    color:#1f6b52; line-height:1.1;"
+                    color:#b02a3c; line-height:1.1;"
              th:text="${inviati}">0</div>
-        <div style="font-family:Arial,sans-serif; font-size:12px; color:#8a94a2;
+        <div style="font-family:Arial,sans-serif; font-size:12px; color:#948a8e;
                     padding-top:6px; text-transform:uppercase; letter-spacing:1px;">
           Inviati
         </div>
       </td>
       <td width="12">&nbsp;</td>
       <td width="33%" align="center"
-          style="background-color:#f2f4f6; border:1px solid #dfe3e8; border-radius:12px;
+          style="background-color:#f5f2f3; border:1px solid #e6dfe1; border-radius:12px;
                  padding:20px 8px;">
         <div style="font-family:Arial,sans-serif; font-size:30px; font-weight:bold;
-                    color:#1f6b52; line-height:1.1;"
+                    color:#b02a3c; line-height:1.1;"
              th:text="${ricevuti}">0</div>
-        <div style="font-family:Arial,sans-serif; font-size:12px; color:#8a94a2;
+        <div style="font-family:Arial,sans-serif; font-size:12px; color:#948a8e;
                     padding-top:6px; text-transform:uppercase; letter-spacing:1px;">
           Ricevuti
         </div>
       </td>
       <td width="12">&nbsp;</td>
       <td width="33%" align="center"
-          style="background-color:#f2f4f6; border:1px solid #dfe3e8; border-radius:12px;
+          style="background-color:#f5f2f3; border:1px solid #e6dfe1; border-radius:12px;
                  padding:20px 8px;">
         <div style="font-family:Arial,sans-serif; font-size:30px; font-weight:bold;
-                    color:#1f6b52; line-height:1.1;"
+                    color:#b02a3c; line-height:1.1;"
              th:text="${chatAperte}">0</div>
-        <div style="font-family:Arial,sans-serif; font-size:12px; color:#8a94a2;
+        <div style="font-family:Arial,sans-serif; font-size:12px; color:#948a8e;
                     padding-top:6px; text-transform:uppercase; letter-spacing:1px;">
           Chat aperte
         </div>
@@ -60,12 +60,13 @@
     </tr>
   </table>
 
+  <!-- Il filo che lega: bordo rosso a sinistra, tecnica che regge ovunque -->
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="margin:0 0 24px 0;">
     <tr>
-      <td style="background-color:#eef7f2; border-left:4px solid #1f6b52; border-radius:4px;
+      <td style="background-color:#fdf1f3; border-left:4px solid #c9384a; border-radius:4px;
                  padding:14px 16px; font-family:Arial,sans-serif; font-size:14px;
-                 line-height:1.5; color:#2c4c40;">
+                 line-height:1.5; color:#7a2130;">
         In totale hai scambiato
         <strong th:text="${totale}">0</strong> messaggi
         in <strong th:text="${chatAperte}">0</strong> conversazioni.
@@ -73,7 +74,7 @@
     </tr>
   </table>
 
-  <p style="margin:0; font-size:13px; color:#8a94a2;">
+  <p style="margin:0; font-size:13px; color:#948a8e;">
     Questo riepilogo è stato generato su tua richiesta e fotografa la situazione
     di adesso. Puoi richiederlo quando vuoi dalla pagina Statistiche.
   </p>
