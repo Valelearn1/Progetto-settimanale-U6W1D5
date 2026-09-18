@@ -21,3 +21,4 @@ dist/
 
 # === Log ===
 *.log
+logs/

@@ -51,7 +51,12 @@ public class DataSeeder implements CommandLineRunner {
         long creati = PROFILI.stream().filter(this::creaSeManca).count();
 
         if (creati > 0) {
-            log.info("Rubrica dimostrativa: {} profili creati (password: {})", creati, PASSWORD);
+            // Unica password che finisce nel log di tutto il progetto, ed e'
+            // voluto: e' una credenziale dimostrativa pubblica, uguale per tutti
+            // i profili finti e documentata nel README. Le password vere degli
+            // utenti non compaiono da nessuna parte.
+            log.info("Rubrica dimostrativa: {} profili creati (password comune: {})",
+                    creati, PASSWORD);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.demo.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * messaggio inutile.
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -77,7 +79,36 @@ public class GlobalExceptionHandler {
         return risposta(HttpStatus.BAD_REQUEST, dettagli);
     }
 
+    /**
+     * Rete di sicurezza per tutto quello che non abbiamo previsto.
+     *
+     * <p>Senza questo metodo un errore imprevisto uscirebbe come 500 generato
+     * da Spring, e nel log non resterebbe nulla di nostro. E' l'unico punto in
+     * cui serve lo stack trace completo: un 5xx e' un guasto, e senza la traccia
+     * non si trova.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> imprevista(Exception e) {
+        log.error("Errore non gestito: {}", e.getMessage(), e);
+        return risposta(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Errore interno del server. Riprova tra poco.");
+    }
+
+    /**
+     * Ogni risposta d'errore passa da qui, quindi qui si logga.
+     *
+     * <p>Il livello segue lo stato: i 4xx sono colpa della richiesta e vanno a
+     * WARN (un 404 non e' un guasto), i 5xx vanno a ERROR. Distinguerli e' cio'
+     * che rende il log utile: se tutto fosse ERROR, gli errori veri sarebbero
+     * sepolti sotto le password sbagliate.
+     */
     private ResponseEntity<Map<String, Object>> risposta(HttpStatus stato, String messaggio) {
+        if (stato.is5xxServerError()) {
+            log.error("{} - {}", stato.value(), messaggio);
+        } else {
+            log.warn("{} - {}", stato.value(), messaggio);
+        }
+
         Map<String, Object> corpo = new LinkedHashMap<>();
         corpo.put("stato", stato.value());
         corpo.put("messaggio", messaggio);

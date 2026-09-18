@@ -3,6 +3,7 @@ package com.example.demo.listener;
 import com.example.demo.dto.ws.PresenceUpdate;
 import com.example.demo.service.PresenceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
@@ -23,6 +24,7 @@ import java.security.Principal;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WebSocketEventListener {
 
     private final PresenceService presenceService;
@@ -52,6 +54,7 @@ public class WebSocketEventListener {
     }
 
     private void annuncia(String username, boolean online) {
+        log.info("Presenza: '{}' e' {}", username, online ? "online" : "offline");
         messagingTemplate.convertAndSend("/topic/presence", new PresenceUpdate(username, online));
     }
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configurazione del logging.
+
+  Due destinazioni con scopi diversi:
+    CONSOLE  quello che guardi mentre sviluppi, colorato e conciso
+    FILE     lo storico su disco, l'unico posto dove cercare cosa e' successo
+             ieri; la console sparisce appena chiudi il terminale
+
+  Il file ruota ogni giorno e si tiene 14 giorni o 200 MB, quello che viene
+  prima: senza un tetto, un log dimenticato riempie il disco.
+-->
+<configuration>
+
+    <!-- Colori, conversioni e proprieta' standard di Spring Boot -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <property name="CARTELLA_LOG" value="${LOG_PATH:-logs}"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%clr(%d{HH:mm:ss.SSS}){faint} %clr(%-5level) %clr([%15.15thread]){faint} %clr(%-42.42logger{40}){cyan} %clr(:){faint} %msg%n%wEx</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${CARTELLA_LOG}/filorosso.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${CARTELLA_LOG}/filorosso.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <!-- Sul file niente colori: i codici ANSI lo renderebbero illeggibile -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{40} : %msg%n%wEx</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Il nostro codice: e' quello che vogliamo davvero leggere -->
+    <logger name="com.example.demo" level="INFO"/>
+
+    <!-- Rumore delle librerie: alzato a WARN per non seppellire il resto -->
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.springframework.web.socket" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

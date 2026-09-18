@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
 
     private static final String PREFISSO = "Bearer ";
@@ -47,11 +49,14 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
             String header = accessor.getFirstNativeHeader("Authorization");
 
             if (header == null || !header.startsWith(PREFISSO)) {
+                log.warn("WebSocket: CONNECT rifiutato, token assente");
                 throw new MessagingException("Token mancante: impossibile aprire la sessione");
             }
 
             String username = jwtService.extractUsername(header.substring(PREFISSO.length()));
             if (username == null) {
+                // Si registra il rifiuto, mai il token: e' pur sempre una credenziale.
+                log.warn("WebSocket: CONNECT rifiutato, token non valido o scaduto");
                 throw new MessagingException("Token non valido o scaduto");
             }
 

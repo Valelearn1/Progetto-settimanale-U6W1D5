@@ -5,6 +5,7 @@ import com.example.demo.dto.openrouter.ChatCompletionRequest;
 import com.example.demo.dto.openrouter.ChatCompletionResponse;
 import com.example.demo.dto.openrouter.WireMessage;
 import com.example.demo.exception.OpenRouterException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -24,6 +25,7 @@ import java.util.List;
  * </pre>
  */
 @Service
+@Slf4j
 public class OpenRouterService {
 
     private final RestClient client;
@@ -53,6 +55,10 @@ public class OpenRouterService {
                 new ChatCompletionRequest.Reasoning(properties.isReasoningEnabled()),
                 properties.getMaxTokens());
 
+        // La durata e' il dato piu' utile da avere qui: OpenRouter e' l'unica
+        // dipendenza esterna, ed e' quella che puo' rallentare tutto il resto.
+        long inizio = System.nanoTime();
+
         ChatCompletionResponse risposta;
         try {
             risposta = client.post()
@@ -70,11 +76,23 @@ public class OpenRouterService {
         } catch (ResourceAccessException e) {
             // Host irraggiungibile o timeout: e' diverso da "ha risposto male",
             // e all'utente va detto in modo diverso.
+            log.error("OpenRouter irraggiungibile dopo {} ms: {}", millisDa(inizio), e.getMessage());
             throw new OpenRouterException(
                     "Impossibile contattare OpenRouter: " + e.getMessage(), e);
         }
 
-        return estraiContenuto(risposta);
+        String contenuto = estraiContenuto(risposta);
+        // La chiave non compare mai: si logga il modello, non le credenziali.
+        log.info("OpenRouter: modello={} reasoning={} durata={} ms messaggi={}",
+                properties.getDefaultModel(),
+                properties.isReasoningEnabled(),
+                millisDa(inizio),
+                conversazione.size());
+        return contenuto;
+    }
+
+    private static long millisDa(long inizioNano) {
+        return (System.nanoTime() - inizioNano) / 1_000_000;
     }
 
     private String estraiContenuto(ChatCompletionResponse risposta) {
