@@ -418,17 +418,25 @@
 }
 
 .spunta {
-  font-size: 11px;
-  letter-spacing: -2px;
+  /* Allinea il disegno alla linea di base dell'orario accanto */
+  display: block;
+  margin-bottom: -1px;
+  flex-shrink: 0;
 }
 
 /*
-  La bolla inviata e' rosso scuro in ENTRAMBI i temi, quindi la spunta "letto"
-  ha un colore fisso: il verde del tema chiaro, pensato per fondi chiari, su
-  questo rosso risultava illeggibile.
+  Spunta "letto": rosa chiaro della famiglia del filo.
+
+  Colore FISSO in entrambi i temi, perche' la bolla inviata e' bordeaux in
+  entrambi. Non puo' essere il bordeaux stesso: su fondo bordeaux sparirebbe.
+  Questo rosa e' lo stesso rosso schiarito fino a staccare dal fondo — resta
+  riconoscibile come "il filo", ma si legge.
+
+  Non e' verde di proposito: nel progetto il verde appartiene solo alla
+  presenza online, e usarlo anche qui avrebbe diluito quel significato.
 */
 .bolla.inviata .spunta.letta {
-  color: #7fe3c0;
+  color: #ffb3c0;
 }
 
 /* ==========================================================================

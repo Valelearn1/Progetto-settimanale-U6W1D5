@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import Spunta from './Spunta'
 
 const ORA = new Intl.DateTimeFormat('it-IT', { hour: '2-digit', minute: '2-digit' })
 const GIORNO = new Intl.DateTimeFormat('it-IT', {
@@ -81,14 +82,7 @@ export default function MessageList({ messaggi, ioId, staScrivendo }) {
                   <span>{ORA.format(data)}</span>
                   {/* La doppia spunta ha senso solo sui messaggi che ho mandato
                       io: sapere di aver letto i miei non serve a nessuno. */}
-                  {mio && (
-                    <span
-                      className={`spunta${m.readAt ? ' letta' : ''}`}
-                      title={m.readAt ? 'Letto' : 'Inviato'}
-                    >
-                      {m.readAt ? '✓✓' : '✓'}
-                    </span>
-                  )}
+                  {mio && <Spunta letta={Boolean(m.readAt)} />}
                 </div>
               )}
             </div>
