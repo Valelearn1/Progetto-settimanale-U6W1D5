@@ -19,4 +19,13 @@ public final class MailEvents {
 
     public record RegistrationRequested(String email, String displayName, String codice) {
     }
+
+    public record StatsRequested(
+            String email,
+            String displayName,
+            long inviati,
+            long ricevuti,
+            long chatAperte,
+            java.time.Instant dal) {
+    }
 }

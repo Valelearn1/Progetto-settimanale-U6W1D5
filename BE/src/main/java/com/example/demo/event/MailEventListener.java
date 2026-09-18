@@ -20,6 +20,11 @@ public class MailEventListener {
                 event.email(), event.displayName(), event.codice()), event.email());
     }
 
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onStats(MailEvents.StatsRequested event) {
+        invia(() -> mailService.sendStatsEmail(event), event.email());
+    }
+
     /**
      * Se l'invio fallisce lo registriamo nei log senza propagare l'errore: il
      * dato e' gia' stato salvato e non ha senso annullarlo perche' Gmail era
@@ -28,6 +33,10 @@ public class MailEventListener {
     private void invia(Runnable azione, String destinatario) {
         try {
             azione.run();
+            // Traccia anche il successo: senza, un evento scartato in silenzio
+            // (per esempio pubblicato fuori da una transazione) sarebbe
+            // indistinguibile da un invio riuscito.
+            log.info("Email inviata a {}", destinatario);
         } catch (Exception e) {
             log.error("Invio email a {} fallito: {}", destinatario, e.getMessage());
         }

@@ -513,6 +513,14 @@ for (Message m : ultimiMessaggi) {
 }
 ```
 
+**L'ultimo turno deve essere dell'utente.** Dopo la cronologia va aggiunto un
+messaggio `user` con l'istruzione conclusiva. Non è una rifinitura del prompt: senza,
+il provider rifiuta la richiesta con `400 — "No user query found in messages"`, e
+succede in due casi tutt'altro che rari, cioè **a conversazione vuota** e **ogni volta
+che l'ultimo messaggio l'ho scritto io** (che in una cronologia ribaltata diventa un
+turno `assistant`). Chiuderla così ha anche il vantaggio di ripetere il formato
+richiesto subito prima della generazione.
+
 L'API è senza memoria: la finestra di contesto va rispedita a ogni chiamata. Si mandano
 gli ultimi `openrouter.max-history-messages` (default 12), non l'intera conversazione:
 oltre quella soglia il suggerimento non migliora e la latenza cresce.

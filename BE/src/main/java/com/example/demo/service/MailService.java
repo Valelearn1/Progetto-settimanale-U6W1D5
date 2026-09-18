@@ -19,6 +19,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MailService {
 
+    /** Un Instant non ha fuso orario: senza withZone la formattazione fallisce. */
+    private static final java.time.format.DateTimeFormatter FORMATO_DATA =
+            java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy", java.util.Locale.ITALIAN)
+                    .withZone(java.time.ZoneId.systemDefault());
+
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
@@ -50,6 +55,34 @@ public class MailService {
 
                 Se non ti sei registrato tu, ignora questo messaggio.
                 """.formatted(displayName, link, codice));
+    }
+
+    public void sendStatsEmail(com.example.demo.event.MailEvents.StatsRequested dati) {
+        String dal = FORMATO_DATA.format(dati.dal());
+        long totale = dati.inviati() + dati.ricevuti();
+
+        invia(dati.email(),
+                "Le tue statistiche su Sinapsi",
+                "mail/statistiche",
+                Map.of(
+                        "nome", dati.displayName(),
+                        "inviati", dati.inviati(),
+                        "ricevuti", dati.ricevuti(),
+                        "chatAperte", dati.chatAperte(),
+                        "totale", totale,
+                        "dal", dal),
+                "%d messaggi inviati, %d ricevuti, %d conversazioni"
+                        .formatted(dati.inviati(), dati.ricevuti(), dati.chatAperte()),
+                """
+                Ciao %s, ecco il riepilogo della tua attività su Sinapsi dal %s.
+
+                Messaggi inviati:   %d
+                Messaggi ricevuti:  %d
+                Conversazioni:      %d
+
+                In totale hai scambiato %d messaggi.
+                """.formatted(dati.displayName(), dal,
+                        dati.inviati(), dati.ricevuti(), dati.chatAperte(), totale));
     }
 
     /**
