@@ -36,6 +36,9 @@ function intestazioni(token, conCorpo = false) {
 const get = (path, token) =>
   fetch(`${BASE}${path}`, { headers: intestazioni(token) }).then(comeJson)
 
+const put = (path, token) =>
+  fetch(`${BASE}${path}`, { method: 'PUT', headers: intestazioni(token) }).then(comeJson)
+
 const post = (path, corpo, token) =>
   fetch(`${BASE}${path}`, {
     method: 'POST',
@@ -56,6 +59,7 @@ export const io = (token) => get('/api/users/me', token)
 export const mieChat = (token) => get('/api/chats', token)
 export const apriChat = (peerId, token) => post('/api/chats', { peerId }, token)
 export const messaggiDi = (chatId, token) => get(`/api/chats/${chatId}/messages`, token)
+export const cambiaPreferita = (chatId, token) => put(`/api/chats/${chatId}/favorite`, token)
 
 // === Presenza ===
 export const chiEOnline = (token) => get('/api/presence', token)

@@ -30,6 +30,11 @@ export function creaClient(token, eventi) {
         eventi.onMessaggio?.(Array.isArray(payload) ? payload : [payload])
       })
 
+      // "Sta scrivendo": arriva solo a me, solo dall'altra persona.
+      client.subscribe('/user/queue/typing', (frame) => {
+        eventi.onScrittura?.(JSON.parse(frame.body))
+      })
+
       // Broadcast: chi entra e chi esce.
       client.subscribe('/topic/presence', (frame) => {
         eventi.onPresenza?.(JSON.parse(frame.body))
@@ -53,6 +58,18 @@ export function inviaMessaggio(client, chatId, content) {
   client.publish({
     destination: '/app/chat.send',
     body: JSON.stringify({ chatId, content }),
+  })
+}
+
+/**
+ * Annuncia che sto scrivendo (o che ho smesso).
+ * Il chiamante deve limitarne la frequenza: un invio a ogni tasto premuto
+ * inonderebbe il socket senza aggiungere informazione.
+ */
+export function segnalaScrittura(client, chatId, scrivendo) {
+  client.publish({
+    destination: '/app/chat.typing',
+    body: JSON.stringify({ chatId, scrivendo }),
   })
 }
 

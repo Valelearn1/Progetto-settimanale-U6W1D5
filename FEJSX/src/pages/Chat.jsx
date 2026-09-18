@@ -7,13 +7,22 @@ import SuggestionBar from '../components/SuggestionBar'
 import { useAuth } from '../context/AuthContext'
 import {
   apriChat,
+  cambiaPreferita,
   chiEOnline,
   messaggiDi,
   mieChat,
   rubrica,
   suggerisci,
 } from '../api'
-import { creaClient, inviaMessaggio, segnalaLettura } from '../ws'
+import {
+  creaClient,
+  inviaMessaggio,
+  segnalaLettura,
+  segnalaScrittura,
+} from '../ws'
+
+/** Dopo quanto silenzio si smette di dire "sta scrivendo". */
+const PAUSA_SCRITTURA = 2500
 
 export default function Chat() {
   const { token, utente, logout } = useAuth()
@@ -31,6 +40,12 @@ export default function Chat() {
   const [modello, setModello] = useState(null)
   const [aiInCorso, setAiInCorso] = useState(false)
   const [aiErrore, setAiErrore] = useState(null)
+
+  // Chi sta scrivendo, per chat. È uno stato effimero: non viene mai salvato
+  // né richiesto al server all'avvio.
+  const [scrivendo, setScrivendo] = useState({})
+  const timerScrittura = useRef(null)
+  const scritturaAnnunciata = useRef(false)
 
   const client = useRef(null)
   // I gestori STOMP sono registrati una volta sola alla connessione, quindi
@@ -133,6 +148,17 @@ export default function Chat() {
           else nuovo.delete(username)
           return nuovo
         }),
+      onScrittura: ({ chatId, scrivendo: attivo }) => {
+        setScrivendo((precedenti) => ({ ...precedenti, [chatId]: attivo }))
+        // Rete di sicurezza: se il "ho smesso" si perde per strada, l'indicatore
+        // resterebbe acceso per sempre. Scade da solo.
+        if (attivo) {
+          setTimeout(
+            () => setScrivendo((p) => ({ ...p, [chatId]: false })),
+            PAUSA_SCRITTURA + 1500,
+          )
+        }
+      },
       onNuovoUtente: (u) =>
         setContatti((precedenti) =>
           precedenti.some((c) => c.id === u.id) || u.id === utente.id
@@ -153,6 +179,8 @@ export default function Chat() {
   const apri = useCallback(
     async (chatId) => {
       setChatAttiva(chatId)
+      scritturaAnnunciata.current = false
+      clearTimeout(timerScrittura.current)
       setProposte([])
       setAiErrore(null)
       setTesto('')
@@ -193,8 +221,47 @@ export default function Chat() {
     const contenuto = testo.trim()
     if (!contenuto || !chatAttiva || !client.current?.connected) return
     inviaMessaggio(client.current, chatAttiva, contenuto)
+    fermaAnnuncioScrittura()
     setTesto('')
     setProposte([])
+  }
+
+  /**
+   * Annuncia "sto scrivendo" al primo carattere e non a ogni tasto: il socket
+   * riceverebbe decine di messaggi identici senza aggiungere informazione.
+   * Il "ho smesso" parte da solo dopo qualche secondo di silenzio.
+   */
+  function suDigitazione(nuovoTesto) {
+    setTesto(nuovoTesto)
+    if (!chatAttiva || !client.current?.connected) return
+
+    if (!scritturaAnnunciata.current && nuovoTesto.trim()) {
+      segnalaScrittura(client.current, chatAttiva, true)
+      scritturaAnnunciata.current = true
+    }
+
+    clearTimeout(timerScrittura.current)
+    timerScrittura.current = setTimeout(fermaAnnuncioScrittura, PAUSA_SCRITTURA)
+  }
+
+  function fermaAnnuncioScrittura() {
+    clearTimeout(timerScrittura.current)
+    if (scritturaAnnunciata.current && chatAttiva && client.current?.connected) {
+      segnalaScrittura(client.current, chatAttiva, false)
+    }
+    scritturaAnnunciata.current = false
+  }
+
+  async function togglePreferita(chatId) {
+    try {
+      const aggiornata = await cambiaPreferita(chatId, token)
+      // La sidebar viene ricaricata dal server: l'ordine (preferite in cima,
+      // poi per attività) lo decide lui, e rifarlo qui lo farebbe divergere.
+      setChat(await mieChat(token))
+      return aggiornata
+    } catch (e) {
+      setErrore(e.message)
+    }
   }
 
   /* ---------- suggerimenti AI ---------- */
@@ -222,6 +289,23 @@ export default function Chat() {
     [chat, chatAttiva],
   )
 
+  /*
+    Il totale dei non letti finisce nel titolo della scheda: è l'unico modo di
+    accorgersi di un messaggio quando Filo Rosso è in secondo piano, senza
+    chiedere il permesso per le notifiche di sistema.
+  */
+  const nonLettiTotali = useMemo(
+    () => chat.reduce((somma, c) => somma + c.nonLetti, 0),
+    [chat],
+  )
+
+  useEffect(() => {
+    document.title = nonLettiTotali > 0 ? `(${nonLettiTotali}) Filo Rosso` : 'Filo Rosso'
+    return () => {
+      document.title = 'Filo Rosso'
+    }
+  }, [nonLettiTotali])
+
   const contattiSenzaChat = useMemo(() => {
     const conChat = new Set(chat.map((c) => c.interlocutore.id))
     return contatti.filter((u) => !conChat.has(u.id))
@@ -241,6 +325,7 @@ export default function Chat() {
         io={utente}
         onApriChat={apri}
         onNuovaChat={nuovaConversazione}
+        onPreferita={togglePreferita}
         onEsci={logout}
       />
 
@@ -280,7 +365,11 @@ export default function Chat() {
               </div>
             </header>
 
-            <MessageList messaggi={messaggi} ioId={utente.id} />
+            <MessageList
+              messaggi={messaggi}
+              ioId={utente.id}
+              staScrivendo={Boolean(scrivendo[chatAttiva])}
+            />
 
             <div className="composer">
               <SuggestionBar
@@ -296,7 +385,7 @@ export default function Chat() {
               />
               <Composer
                 testo={testo}
-                setTesto={setTesto}
+                setTesto={suDigitazione}
                 onInvia={invia}
                 disabilitato={!chatAttiva}
               />

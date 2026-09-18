@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
@@ -38,6 +39,15 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
             WHERE p.id = :me AND c.lastMessageAt IS NOT NULL
             """)
     long countChatAperte(@Param("me") UUID me);
+
+    /**
+     * Gli id delle conversazioni che questo utente ha fra i preferiti.
+     *
+     * <p>Una query sola per tutta la sidebar, invece di una per riga: il
+     * chiamante costruisce un Set e ci fa i controlli in memoria.
+     */
+    @Query("SELECT c.id FROM User u JOIN u.preferite c WHERE u.id = :me")
+    Set<UUID> idPreferite(@Param("me") UUID me);
 
     /**
      * I nodi del grafo dei contatti: un contatto per riga, con quanti messaggi

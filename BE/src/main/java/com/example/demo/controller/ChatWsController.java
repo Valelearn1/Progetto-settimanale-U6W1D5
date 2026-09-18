@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.response.MessageDTO;
 import com.example.demo.dto.ws.IncomingMessage;
 import com.example.demo.dto.ws.ReadRequest;
+import com.example.demo.dto.ws.TypingUpdate;
 import com.example.demo.entity.Chat;
 import com.example.demo.entity.User;
 import com.example.demo.repository.ChatRepository;
@@ -58,6 +59,24 @@ public class ChatWsController {
         }
 
         consegnaAEntrambi(request.chatId(), aggiornati);
+    }
+
+    /**
+     * "Sto scrivendo" / "ho smesso".
+     *
+     * <p>Va solo all'altra persona, non anche a me: vedermi scrivere da solo
+     * non aggiunge nulla. E non tocca mai il database — e' un dato che sarebbe
+     * gia' vecchio nel momento in cui lo si legge.
+     */
+    @MessageMapping("/chat.typing")
+    public void scrivendo(TypingUpdate richiesta, Principal principal) {
+        User io = userService.findByUsername(principal.getName());
+        Chat chat = chatService.caricaSePartecipo(richiesta.chatId(), io);
+
+        messagingTemplate.convertAndSendToUser(
+                chat.altroRispettoA(io).getUsername(),
+                "/queue/typing",
+                new TypingUpdate(richiesta.chatId(), io.getUsername(), richiesta.scrivendo()));
     }
 
     /** Spedisce lo stesso payload ai due partecipanti della conversazione. */

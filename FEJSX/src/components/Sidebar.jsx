@@ -7,6 +7,10 @@ import ThemeToggle from './ThemeToggle'
  * hai ancora parlato. Sono due elenchi distinti di proposito — mescolarli
  * farebbe perdere l'ordine per attività recente, che è l'unica ragione per cui
  * il backend tiene `lastMessageAt`.
+ *
+ * L'ordine delle conversazioni lo decide il server: preferite in cima, poi le
+ * più recenti. Qui non si riordina nulla, altrimenti i due criteri
+ * divergerebbero al primo aggiornamento.
  */
 export default function Sidebar({
   chat,
@@ -16,6 +20,7 @@ export default function Sidebar({
   io,
   onApriChat,
   onNuovaChat,
+  onPreferita,
   onEsci,
 }) {
   return (
@@ -39,11 +44,18 @@ export default function Sidebar({
             </p>
           )}
           {chat.map((c) => (
-            <button
+            <div
               key={c.id}
-              type="button"
               className={`riga${c.id === chatAttiva ? ' attiva' : ''}`}
+              role="button"
+              tabIndex={0}
               onClick={() => onApriChat(c.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onApriChat(c.id)
+                }
+              }}
             >
               <Avatar
                 utente={c.interlocutore}
@@ -56,7 +68,21 @@ export default function Sidebar({
                 </span>
               </span>
               {c.nonLetti > 0 && <span className="badge">{c.nonLetti}</span>}
-            </button>
+              <button
+                type="button"
+                className={`stella${c.preferita ? ' accesa' : ''}`}
+                title={c.preferita ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'}
+                aria-label={c.preferita ? 'Togli dai preferiti' : 'Aggiungi ai preferiti'}
+                aria-pressed={c.preferita}
+                onClick={(e) => {
+                  // Senza questo, il clic sulla stella aprirebbe anche la chat.
+                  e.stopPropagation()
+                  onPreferita(c.id)
+                }}
+              >
+                {c.preferita ? '★' : '☆'}
+              </button>
+            </div>
           ))}
         </div>
 

@@ -2,6 +2,10 @@ package com.example.demo.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,6 +17,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -61,6 +67,24 @@ public class User {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    /**
+     * Le conversazioni che ho messo fra i preferiti.
+     *
+     * <p>Sta su User e non su Chat perche' "preferita" e' una proprieta' MIA:
+     * un flag sulla conversazione la marcherebbe anche per l'altra persona.
+     *
+     * <p>LAZY di proposito: l'utente viene caricato a ogni richiesta dal filtro
+     * JWT, e tirarsi dietro l'elenco delle preferite ogni volta sarebbe una
+     * join pagata per niente. Chi ne ha bisogno usa le query dedicate in
+     * ChatRepository, che restituiscono solo gli id.
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_favorites",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "chat_id"))
+    private Set<Chat> preferite = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

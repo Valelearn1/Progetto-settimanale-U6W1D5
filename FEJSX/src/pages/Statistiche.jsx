@@ -51,16 +51,16 @@ export default function Statistiche() {
   return (
     <div className="pagina">
       <div className="pagina-intestazione">
-        <div className="marchio">
-          <span className="marchio-quadrato">F</span>
-          Filo Rosso
-        </div>
         <div className="riga-azioni">
-          <ThemeToggle esteso />
-          <Link className="link" to="/chat">
+          <Link className="bottone-secondario" to="/chat">
             ← Torna alle conversazioni
           </Link>
+          <div className="marchio">
+            <span className="marchio-quadrato">F</span>
+            Filo Rosso
+          </div>
         </div>
+        <ThemeToggle esteso />
       </div>
 
       <h1>Le tue statistiche</h1>
